@@ -40,6 +40,7 @@ import_collection: '{' import_path (?1 ',' import_path)* [','] '}';
 // #import crate::module::Symbol
 // #import crate::module::{Symbol1, Symbol2}
 // #import crate::module as alias
+// Simplified: just support path + optional collection at the end
 hash_import: '#' 'import' name ('::' name)* [import_collection] ['as' name] ';' @hash_import;
 
 // TODO: validate that directives come before declarations to improve error messages

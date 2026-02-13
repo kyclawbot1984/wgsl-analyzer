@@ -2,6 +2,7 @@
 
 mod expression;
 mod imports;
+mod bevy_imports;
 
 use expect_test::{Expect, expect};
 
