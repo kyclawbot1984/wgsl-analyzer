@@ -148,6 +148,15 @@ impl<'source> ParserCallbacks<'source> for Parser<'source> {
         }
     }
 
+    // Bevy-style #import is allowed in both WGSL and WESL modes
+    fn create_node_hash_import(
+        &mut self,
+        _node_ref: NodeRef,
+        _diags: &mut Vec<Self::Diagnostic>,
+    ) {
+        // No error - #import is allowed in WGSL mode for Bevy compatibility
+    }
+
     fn predicate_import_collection_1(&self) -> bool {
         self.peek(1) != Token::RBrace
     }
