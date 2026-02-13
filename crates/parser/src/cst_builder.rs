@@ -119,6 +119,7 @@ impl CstBuilder<'_, '_> {
             Rule::ImportSuperRelative => self.start_node(SyntaxKind::ImportSuperRelative),
             Rule::ImportStatement => self.start_node(SyntaxKind::ImportStatement),
             Rule::HashImport => self.start_node(SyntaxKind::HashImport),
+            Rule::HashImportPath => self.start_node(SyntaxKind::HashImport),
             Rule::IndexingExpression => self.start_node(SyntaxKind::IndexExpression),
             Rule::LetDeclaration => self.start_node(SyntaxKind::LetDeclaration),
             Rule::LoopStatement => self.start_node(SyntaxKind::LoopStatement),

@@ -5,7 +5,6 @@ fn test_hash_import_parsing() {
     
     let result = crate::parse_entrypoint(input, crate::ParseEntryPoint::File, crate::Edition::Wgsl);
     
-    // Just check that there are no errors
     assert!(result.errors.is_empty(), "Parse errors: {:?}", result.errors);
 }
 
@@ -18,5 +17,21 @@ fn test_hash_import_with_alias() {
     assert!(result.errors.is_empty(), "Parse errors: {:?}", result.errors);
 }
 
-// Note: Collection syntax {Symbol1, Symbol2} currently has grammar issues
-// Will be fixed later
+#[test]
+fn test_hash_import_with_collection() {
+    let input = "#import bevy_pbr::forward_io::{VertexOutput, FragmentOutput};";
+    
+    let result = crate::parse_entrypoint(input, crate::ParseEntryPoint::File, crate::Edition::Wgsl);
+    
+    assert!(result.errors.is_empty(), "Parse errors: {:?}", result.errors);
+}
+
+#[test]
+fn test_hash_import_multiple() {
+    // Multiple imports on separate lines
+    let input = "#import bevy_pbr::forward_io::VertexOutput;\n#import bevy_pbr::mesh_view_bindings as view_bindings;\n";
+    
+    let result = crate::parse_entrypoint(input, crate::ParseEntryPoint::File, crate::Edition::Wgsl);
+    
+    assert!(result.errors.is_empty(), "Parse errors: {:?}", result.errors);
+}
