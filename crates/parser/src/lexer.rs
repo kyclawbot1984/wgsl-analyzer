@@ -167,6 +167,8 @@ pub enum Token {
     Plus2,
     #[token("--")]
     Minus2,
+    #[token("#")]
+    Hash,
     #[token("import")]
     Import,
     #[token("package")]

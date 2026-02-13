@@ -154,8 +154,10 @@ pub enum SyntaxKind {
     RequiresDirective,
     LanguageExtensionName,
 
-    /// `import foo::bar as baz;`
+    /// `import foo::bar as baz;` (WESL style)
     ImportStatement,
+    /// `#import foo::bar::Symbol` (Bevy style)
+    HashImport,
     /// The `package` token in an import
     ImportPackageRelative,
     /// The `super` token in an import
@@ -245,6 +247,7 @@ pub enum SyntaxKind {
     Super,
     As,
     DoubleColon,
+    Hash,
 
     PlusEqual,
     MinusEqual,
