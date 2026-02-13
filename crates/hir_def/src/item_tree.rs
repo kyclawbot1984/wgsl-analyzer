@@ -81,6 +81,33 @@ impl ImportStatement {
     }
 }
 
+/// Bevy-style #import
+/// #import bevy_pbr::forward_io::VertexOutput
+/// #import bevy_pbr::mesh_view_bindings as view_bindings
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct HashImport {
+    /// The path like bevy_pbr::forward_io
+    pub path: ModPath,
+    /// Imported symbols like {VertexOutput, FragmentOutput}
+    pub imports: Option<Vec<Name>>,
+    /// Alias like view_bindings
+    pub alias: Option<Name>,
+    pub ast_id: FileAstId<ast::HashImport>,
+}
+
+impl HashImport {
+    /// Expands the #import into individually imported symbols
+    /// Simplified implementation - returns None for now
+    pub fn expand<T, Callback: FnMut(FlatImport) -> ControlFlow<T>>(
+        &self,
+        _callback: Callback,
+    ) -> Option<T> {
+        // TODO: Implement proper expansion
+        // For now, just return None - the resolver will handle this differently
+        None
+    }
+}
+
 #[derive(Debug, Eq, PartialEq)]
 pub struct FlatImport {
     pub path: ModPath,
@@ -196,6 +223,7 @@ pub struct Struct {
 pub struct ItemTree {
     top_level: Vec<ModuleItem>,
     imports: Arena<ImportStatement>,
+    hash_imports: Arena<HashImport>,
     functions: Arena<Function>,
     global_variables: Arena<GlobalVariable>,
     global_constants: Arena<GlobalConstant>,
@@ -228,6 +256,7 @@ impl ItemTree {
         self.top_level.iter().filter_map(|item| match item {
             ModuleItem::Struct(r#struct) => Some(*r#struct),
             ModuleItem::ImportStatement(_)
+            | ModuleItem::HashImport(_)
             | ModuleItem::Function(_)
             | ModuleItem::GlobalVariable(_)
             | ModuleItem::GlobalConstant(_)
@@ -352,6 +381,7 @@ macro_rules! mod_items {
 
 mod_items! {
     ImportStatement in imports -> ast::ImportStatement,
+    HashImport in hash_imports -> ast::HashImport,
     Function in functions -> ast::FunctionDeclaration,
     Struct in structs -> ast::StructDeclaration,
     GlobalVariable in global_variables -> ast::VariableDeclaration,

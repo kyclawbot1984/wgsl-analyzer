@@ -11,7 +11,7 @@ use crate::{
     database::{FunctionId, Location},
     expression_store::path::Path,
     item_tree::{
-        Function, GlobalConstant, GlobalVariable, ItemTree, ModuleItem, Name, Override, Struct,
+        Function, GlobalConstant, GlobalVariable, HashImport, ItemTree, ModuleItem, Name, Override, Struct,
         TypeAlias,
     },
 };
@@ -167,6 +167,10 @@ impl Resolver {
                                 std::ops::ControlFlow::Continue(())
                             });
                         },
+                        ModuleItem::HashImport(_id) => {
+                            // TODO: HashImport scope resolution - symbols won't resolve properly yet
+                            // The imported symbols need to be added to scope
+                        },
                     });
             },
             Scope::Expression(expression_scope) => {
@@ -248,6 +252,11 @@ impl Resolver {
                     },
                     ModuleItem::GlobalAssertStatement(_) => None,
                     ModuleItem::ImportStatement(_id) => None,
+                    ModuleItem::HashImport(_id) => {
+                        // TODO: Implement proper resolution for HashImport
+                        // For now, return None - symbols won't resolve from #import
+                        None
+                    },
                     // TODO: Support import statements https://github.com/wgsl-analyzer/wgsl-analyzer/issues/632
                     /*scope
                     .module_info

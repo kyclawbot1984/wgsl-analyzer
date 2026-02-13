@@ -219,6 +219,17 @@ ast_node! {
     item: Option<ImportTree>;
 }
 
+// Bevy-style #import
+// #import bevy_pbr::forward_io::VertexOutput
+// #import bevy_pbr::mesh_view_bindings as view_bindings
+ast_node! {
+    HashImport:
+    path: Option<Path>;
+    collection: Option<ImportCollection>;
+    alias_token: Option<SyntaxToken As>;
+    alias: Option<Name>;
+}
+
 ast_enum! {
     enum ImportRelative {
         ImportPackageRelative,
@@ -371,6 +382,7 @@ impl HasAttributes for TypeAliasDeclaration {}
 ast_enum! {
     enum Item {
         ImportStatement,
+        HashImport,
         FunctionDeclaration,
         VariableDeclaration,
         ConstantDeclaration,

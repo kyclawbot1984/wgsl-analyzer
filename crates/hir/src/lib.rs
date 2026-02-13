@@ -136,6 +136,8 @@ impl<'database> Semantics<'database> {
                             ChildContainer::GlobalAssertStatementId(definition)
                         }
                     },
+                    // HashImport - not a container
+                    ast::Item::HashImport(_) => return None,
                 };
                 Some(container)
             })
@@ -358,6 +360,7 @@ fn is_node_in_body(
                 .is_some_and(|expression| expression.syntax().text_range().contains(child_offset))
         },
         ast::Item::ImportStatement(_)
+        | ast::Item::HashImport(_)
         | ast::Item::TypeAliasDeclaration(_)
         | ast::Item::StructDeclaration(_) => false,
     }
@@ -480,7 +483,8 @@ fn module_item_to_def(
             let id = database.intern_global_assert_statement(location);
             ModuleDef::GlobalAssertStatement(GlobalAssertStatement { id })
         },
-        ModuleItem::ImportStatement(_) => return smallvec::SmallVec::new(),
+        ModuleItem::ImportStatement(_) 
+        | ModuleItem::HashImport(_) => return smallvec::SmallVec::new(),
     };
     smallvec::smallvec![definition]
 }

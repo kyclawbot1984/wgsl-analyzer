@@ -2,9 +2,10 @@ use syntax::{
     HasName as _,
     ast::{Directive, Item, SourceFile},
 };
+use syntax::AstNode;
 use triomphe::Arc;
 
-use super::{GlobalConstant, GlobalVariable, Override, Struct, TypeAlias};
+use super::{GlobalConstant, GlobalVariable, HashImport, Override, Struct, TypeAlias, Name};
 use crate::{
     HirFileId,
     ast_id::AstIdMap,
@@ -57,6 +58,9 @@ impl<'database> Ctx<'database> {
             Item::ImportStatement(import_statement) => {
                 ModuleItem::ImportStatement(self.lower_import(&import_statement)?)
             },
+            Item::HashImport(hash_import) => {
+                ModuleItem::HashImport(self.lower_hash_import(&hash_import)?)
+            },
             Item::FunctionDeclaration(function) => {
                 ModuleItem::Function(self.lower_function(&function)?)
             },
@@ -92,6 +96,40 @@ impl<'database> Ctx<'database> {
             self.tree
                 .imports
                 .alloc(ImportStatement { kind, tree, ast_id })
+                .into(),
+        )
+    }
+
+    fn lower_hash_import(
+        &mut self,
+        item: &syntax::ast::HashImport,
+    ) -> Option<ModuleItemId<HashImport>> {
+        // Parse the path: bevy_pbr::forward_io::VertexOutput
+        let path_node = item.path()?;
+        
+        // Use ModPath::from_src which properly parses the path
+        let path = ModPath::from_src(&path_node);
+        
+        // Handle collection: #import crate::{A, B}
+        let imports = item.collection().map(|coll| {
+            coll.items()
+                .filter_map(|tree| {
+                    match tree {
+                        syntax::ast::ImportTree::ImportPath(p) => p.name().map(|n| Name::from(n.text().as_str())),
+                        syntax::ast::ImportTree::ImportItem(i) => i.name().map(|n| Name::from(n.text().as_str())),
+                        _ => None,
+                    }
+                })
+                .collect()
+        });
+        
+        let alias = item.alias().map(|a| Name::from(a.text().as_str()));
+        let ast_id = self.source_ast_id_map.ast_id(item);
+        
+        Some(
+            self.tree
+                .hash_imports
+                .alloc(HashImport { path, imports, alias, ast_id })
                 .into(),
         )
     }
